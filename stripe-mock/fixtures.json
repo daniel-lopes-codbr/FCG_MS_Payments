@@ -1,0 +1,90 @@
+{
+  "payment_intents": {
+    "pi_success_123": {
+      "id": "pi_success_123",
+      "object": "payment_intent",
+      "amount": 1000,
+      "currency": "usd",
+      "status": "succeeded",
+      "client_secret": "pi_success_123_secret_test",
+      "customer": "cus_test_success",
+      "description": "Successful payment test",
+      "metadata": {
+        "test_scenario": "success"
+      },
+      "created": 1640995200
+    },
+    "pi_failure_123": {
+      "id": "pi_failure_123",
+      "object": "payment_intent",
+      "amount": 2000,
+      "currency": "usd",
+      "status": "canceled",
+      "client_secret": "pi_failure_123_secret_test",
+      "customer": "cus_test_failure",
+      "description": "Failed payment test",
+      "metadata": {
+        "test_scenario": "failure"
+      },
+      "created": 1640995200,
+      "last_payment_error": {
+        "code": "card_declined",
+        "message": "Your card was declined."
+      }
+    },
+    "pi_processing_123": {
+      "id": "pi_processing_123",
+      "object": "payment_intent",
+      "amount": 1500,
+      "currency": "usd",
+      "status": "processing",
+      "client_secret": "pi_processing_123_secret_test",
+      "customer": "cus_test_processing",
+      "description": "Processing payment test",
+      "metadata": {
+        "test_scenario": "processing"
+      },
+      "created": 1640995200
+    },
+    "pi_requires_payment_method_123": {
+      "id": "pi_requires_payment_method_123",
+      "object": "payment_intent",
+      "amount": 3000,
+      "currency": "usd",
+      "status": "requires_payment_method",
+      "client_secret": "pi_requires_payment_method_123_secret_test",
+      "customer": "cus_test_requires_payment_method",
+      "description": "Requires payment method test",
+      "metadata": {
+        "test_scenario": "requires_payment_method"
+      },
+      "created": 1640995200
+    }
+  },
+  "customers": {
+    "cus_test_success": {
+      "id": "cus_test_success",
+      "object": "customer",
+      "email": "success@test.com",
+      "name": "Test Success Customer"
+    },
+    "cus_test_failure": {
+      "id": "cus_test_failure",
+      "object": "customer",
+      "email": "failure@test.com",
+      "name": "Test Failure Customer"
+    },
+    "cus_test_processing": {
+      "id": "cus_test_processing",
+      "object": "customer",
+      "email": "processing@test.com",
+      "name": "Test Processing Customer"
+    },
+    "cus_test_requires_payment_method": {
+      "id": "cus_test_requires_payment_method",
+      "object": "customer",
+      "email": "requires@test.com",
+      "name": "Test Requires Payment Method Customer"
+    }
+  }
+} 

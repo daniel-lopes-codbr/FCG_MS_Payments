@@ -4,16 +4,32 @@ using FCG_MS_Payments.Domain.Enums;
 using FCG_MS_Payments.Domain.Interfaces;
 using FCG_MS_Payments.Domain.Exceptions;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using FCG_MS_Payments.Infrastructure.Models;
 
 namespace FCG_MS_Payments.Infrastructure.Services;
 
 public class StripeService : IStripeService
 {
     private readonly ILogger<StripeService> _logger;
+    private readonly StripeSettings _stripeSettings;
 
-    public StripeService(ILogger<StripeService> logger)
+    public StripeService(ILogger<StripeService> logger, IOptions<StripeSettings> stripeSettings)
     {
         _logger = logger;
+        _stripeSettings = stripeSettings.Value;
+        
+        // Configure Stripe
+        StripeConfiguration.ApiKey = _stripeSettings.SecretKey;
+        
+        if (_stripeSettings.UseMockServer)
+        {
+            _logger.LogInformation("Using Stripe mock server at: {MockServerUrl}", _stripeSettings.MockServerUrl);
+        }
+        else
+        {
+            _logger.LogInformation("Using real Stripe API");
+        }
     }
 
     public async Task<StripePaymentIntent> CreatePaymentIntentAsync(decimal amount, string currency, string customerId, string description, Dictionary<string, string>? metadata = null)
@@ -43,12 +59,14 @@ public class StripeService : IStripeService
                 ClientSecret = paymentIntent.ClientSecret
             };
 
-            _logger.LogInformation("Created Stripe payment intent: {PaymentIntentId}", paymentIntent.Id);
+            _logger.LogInformation("Created Stripe payment intent: {PaymentIntentId} using {ServerType}", 
+                paymentIntent.Id, _stripeSettings.UseMockServer ? "mock server" : "real Stripe");
             return domainPaymentIntent;
         }
         catch (StripeException ex)
         {
-            _logger.LogError(ex, "Error creating Stripe payment intent");
+            _logger.LogError(ex, "Error creating Stripe payment intent using {ServerType}", 
+                _stripeSettings.UseMockServer ? "mock server" : "real Stripe");
             throw new PaymentException($"Failed to create payment intent: {ex.Message}", ex);
         }
     }
@@ -67,12 +85,14 @@ public class StripeService : IStripeService
                 ClientSecret = paymentIntent.ClientSecret
             };
 
-            _logger.LogInformation("Confirmed Stripe payment intent: {PaymentIntentId}", paymentIntent.Id);
+            _logger.LogInformation("Confirmed Stripe payment intent: {PaymentIntentId} using {ServerType}", 
+                paymentIntent.Id, _stripeSettings.UseMockServer ? "mock server" : "real Stripe");
             return domainPaymentIntent;
         }
         catch (StripeException ex)
         {
-            _logger.LogError(ex, "Error confirming Stripe payment intent: {PaymentIntentId}", paymentIntentId);
+            _logger.LogError(ex, "Error confirming Stripe payment intent: {PaymentIntentId} using {ServerType}", 
+                paymentIntentId, _stripeSettings.UseMockServer ? "mock server" : "real Stripe");
             throw new PaymentException($"Failed to confirm payment intent: {ex.Message}", ex);
         }
     }
@@ -91,12 +111,14 @@ public class StripeService : IStripeService
                 ClientSecret = paymentIntent.ClientSecret
             };
 
-            _logger.LogInformation("Retrieved Stripe payment intent: {PaymentIntentId}", paymentIntent.Id);
+            _logger.LogInformation("Retrieved Stripe payment intent: {PaymentIntentId} using {ServerType}", 
+                paymentIntent.Id, _stripeSettings.UseMockServer ? "mock server" : "real Stripe");
             return domainPaymentIntent;
         }
         catch (StripeException ex)
         {
-            _logger.LogError(ex, "Error retrieving Stripe payment intent: {PaymentIntentId}", paymentIntentId);
+            _logger.LogError(ex, "Error retrieving Stripe payment intent: {PaymentIntentId} using {ServerType}", 
+                paymentIntentId, _stripeSettings.UseMockServer ? "mock server" : "real Stripe");
             throw new PaymentException($"Failed to retrieve payment intent: {ex.Message}", ex);
         }
     }

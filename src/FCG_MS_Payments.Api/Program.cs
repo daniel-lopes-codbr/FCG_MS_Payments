@@ -10,7 +10,8 @@ using FCG_MS_Payments.Application.Validators;
 using FCG_MS_Payments.Domain.Interfaces;
 using FCG_MS_Payments.Infrastructure.Services;
 using FCG_MS_Payments.Infrastructure.Repositories;
-using FCG_MS_Payments.Api.Models;
+using FCG_MS_Payments.Infrastructure.Models;
+using FCG_MS_Payments.Api.HealthChecks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Stripe;
 
@@ -28,6 +29,12 @@ builder.Services.AddSwaggerGen();
 
 // Configure AutoMapper
 builder.Services.AddAutoMapper(typeof(PaymentMappingProfile));
+
+// Configure Stripe Settings
+builder.Services.Configure<StripeSettings>(builder.Configuration.GetSection("StripeSettings"));
+
+// Add HttpClient for health checks
+builder.Services.AddHttpClient();
 
 // Configure JWT Authentication
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
@@ -52,10 +59,6 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// Configure Stripe
-var stripeSettings = builder.Configuration.GetSection("StripeSettings");
-StripeConfiguration.ApiKey = stripeSettings["SecretKey"] ?? "sk_test_your_stripe_test_key";
-
 // Register Application Services
 builder.Services.AddScoped<IPaymentApplicationService, PaymentApplicationService>();
 
@@ -68,6 +71,7 @@ builder.Services.AddScoped<IPaymentRepository, InMemoryPaymentRepository>();
 
 // Configure Health Checks
 builder.Services.AddHealthChecks()
+    .AddCheck<StripeMockHealthCheck>("stripe-mock")
     .AddCheck("self", () => HealthCheckResult.Healthy());
 
 // Configure Logging

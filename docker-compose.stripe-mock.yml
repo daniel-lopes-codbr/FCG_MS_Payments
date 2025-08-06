@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  stripe-mock:
+    image: stripemock/stripe-mock:latest
+    container_name: stripe-mock
+    ports:
+      - "12111:12111"
+    environment:
+      - STRIPE_MOCK_PORT=12111
+      - STRIPE_MOCK_HTTP_PORT=12111
+    command: >
+      --http-port 12111
+      --https-port 12112
+      --fixtures /etc/stripe-mock/fixtures.json
+    volumes:
+      - ./stripe-mock/fixtures.json:/etc/stripe-mock/fixtures.json:ro
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:12111/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - stripe-mock-network
+
+networks:
+  stripe-mock-network:
+    driver: bridge 

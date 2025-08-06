@@ -1,6 +1,6 @@
 # FCG_MS_Payments - Payment Microservice
 
-A .NET 8 microservice for handling Stripe payments, built with Clean Architecture principles.
+A .NET 8 microservice for handling Stripe payments, built with Clean Architecture principles and support for stripe-mock for development.
 
 ## 🏗️ Architecture
 
@@ -15,19 +15,24 @@ This project follows Clean Architecture with the following layers:
 ## 🚀 Features
 
 - **One-time payments** with Stripe integration
+- **Stripe Mock Server** for development and testing
 - **JWT Authentication** for microservice communication
 - **Health checks** for monitoring
 - **Structured logging** with Microsoft.Extensions.Logging
 - **Request validation** with FluentValidation
 - **Object mapping** with AutoMapper
 - **In-memory repository** for development/testing
+- **Docker support** with separate containers for API and stripe-mock
 
 ## 📋 Prerequisites
 
 - .NET 8 SDK
-- Stripe account (for test keys)
+- Docker and Docker Compose
+- (Optional) Stripe account for production
 
 ## 🛠️ Setup
+
+### Option 1: Using Stripe Mock Server (Recommended for Development)
 
 1. **Clone the repository**
    ```bash
@@ -35,34 +40,80 @@ This project follows Clean Architecture with the following layers:
    cd FCG_MS_Payments
    ```
 
-2. **Configure Stripe**
-   - Get your Stripe test keys from the [Stripe Dashboard](https://dashboard.stripe.com/test/apikeys)
-   - Update `src/FCG_MS_Payments.Api/appsettings.json`:
+2. **Start stripe-mock server**
+   ```bash
+   docker-compose -f docker-compose.stripe-mock.yml up -d
+   ```
+
+3. **Start the API with Docker**
+   ```bash
+   cd src
+   docker-compose -f docker-compose.api.yml up --build
+   ```
+
+4. **Or run locally with mock server**
+   ```bash
+   cd src
+   dotnet run --project FCG_MS_Payments.Api
+   ```
+
+### Option 2: Using Real Stripe Account
+
+1. **Get your Stripe test keys** from the [Stripe Dashboard](https://dashboard.stripe.com/test/apikeys)
+2. **Update configuration** in `src/FCG_MS_Payments.Api/appsettings.json`:
    ```json
    {
      "StripeSettings": {
        "SecretKey": "sk_test_your_actual_stripe_test_key",
-       "PublishableKey": "pk_test_your_actual_stripe_publishable_key"
+       "PublishableKey": "pk_test_your_actual_stripe_publishable_key",
+       "UseMockServer": false
      }
    }
    ```
 
-3. **Configure JWT**
-   - Update the JWT secret key in `appsettings.json`:
-   ```json
-   {
-     "JwtSettings": {
-       "SecretKey": "your-super-secret-key-with-at-least-32-characters"
-     }
-   }
-   ```
+## 🧪 Testing with Mock Scenarios
 
-4. **Build and run**
-   ```bash
-   cd src
-   dotnet build
-   dotnet run --project FCG_MS_Payments.Api
-   ```
+The stripe-mock server includes predefined scenarios for testing:
+
+### Available Test Scenarios
+
+1. **Success Scenario** (`cus_test_success`)
+   - Customer ID: `cus_test_success`
+   - Expected status: `succeeded`
+
+2. **Failure Scenario** (`cus_test_failure`)
+   - Customer ID: `cus_test_failure`
+   - Expected status: `canceled`
+
+3. **Processing Scenario** (`cus_test_processing`)
+   - Customer ID: `cus_test_processing`
+   - Expected status: `processing`
+
+4. **Requires Payment Method** (`cus_test_requires_payment_method`)
+   - Customer ID: `cus_test_requires_payment_method`
+   - Expected status: `requires_payment_method`
+
+### Running Test Scenarios
+
+Use the provided test script:
+```bash
+chmod +x test-mock-scenarios.sh
+./test-mock-scenarios.sh
+```
+
+Or test manually with curl:
+```bash
+# Test successful payment
+curl -X POST "http://localhost:5000/api/payments/create" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer your-jwt-token" \
+  -d '{
+    "amount": 10.00,
+    "currency": "usd",
+    "customerId": "cus_test_success",
+    "description": "Test successful payment"
+  }'
+```
 
 ## 📚 API Endpoints
 
@@ -82,7 +133,7 @@ Content-Type: application/json
 {
   "amount": 100.00,
   "currency": "usd",
-  "customerId": "cus_test123",
+  "customerId": "cus_test_success",
   "description": "Payment for product",
   "metadata": {
     "productId": "prod_123",
@@ -121,6 +172,37 @@ GET /api/payments/customer/{customerId}
 GET /health
 ```
 
+## 🐳 Docker Commands
+
+### Start stripe-mock only
+```bash
+docker-compose -f docker-compose.stripe-mock.yml up -d
+```
+
+### Start API with stripe-mock
+```bash
+cd src
+docker-compose -f docker-compose.api.yml up --build
+```
+
+### View logs
+```bash
+# API logs
+docker-compose -f src/docker-compose.api.yml logs -f fcg-ms-payments-api
+
+# Stripe mock logs
+docker-compose -f docker-compose.stripe-mock.yml logs -f stripe-mock
+```
+
+### Stop services
+```bash
+# Stop API
+docker-compose -f src/docker-compose.api.yml down
+
+# Stop stripe-mock
+docker-compose -f docker-compose.stripe-mock.yml down
+```
+
 ## 🧪 Testing
 
 Run the tests:
@@ -132,39 +214,49 @@ dotnet test
 ## 📦 Project Structure
 
 ```
-src/
-├── FCG_MS_Payments.Api/           # Presentation layer
-│   ├── Controllers/               # API controllers
-│   ├── Models/                    # API response models
-│   └── Program.cs                 # Application configuration
-├── FCG_MS_Payments.Application/   # Application layer
-│   ├── DTOs/                     # Data transfer objects
-│   ├── Interfaces/                # Application service interfaces
-│   ├── Services/                  # Application services
-│   ├── Validators/                # FluentValidation validators
-│   └── Mapping/                   # AutoMapper profiles
-├── FCG_MS_Payments.Domain/        # Domain layer
-│   ├── Entities/                  # Domain entities
-│   ├── Enums/                     # Domain enums
-│   ├── Exceptions/                # Domain exceptions
-│   └── Interfaces/                # Domain service interfaces
-├── FCG_MS_Payments.Infrastructure/ # Infrastructure layer
-│   ├── Services/                  # External service implementations
-│   └── Repositories/              # Repository implementations
-└── FCG_MS_Payments.Tests/        # Test projects
-    └── PaymentServiceTests.cs     # Unit tests
+FCG_MS_Payments/
+├── src/
+│   ├── FCG_MS_Payments.Api/           # Presentation layer
+│   │   ├── Controllers/               # API controllers
+│   │   ├── Models/                    # API response models
+│   │   ├── HealthChecks/              # Health check implementations
+│   │   └── Program.cs                 # Application configuration
+│   ├── FCG_MS_Payments.Application/   # Application layer
+│   │   ├── DTOs/                     # Data transfer objects
+│   │   ├── Interfaces/                # Application service interfaces
+│   │   ├── Services/                  # Application services
+│   │   ├── Validators/                # FluentValidation validators
+│   │   └── Mapping/                   # AutoMapper profiles
+│   ├── FCG_MS_Payments.Domain/        # Domain layer
+│   │   ├── Entities/                  # Domain entities
+│   │   ├── Enums/                     # Domain enums
+│   │   ├── Exceptions/                # Domain exceptions
+│   │   └── Interfaces/                # Domain service interfaces
+│   ├── FCG_MS_Payments.Infrastructure/ # Infrastructure layer
+│   │   ├── Services/                  # External service implementations
+│   │   └── Repositories/              # Repository implementations
+│   └── FCG_MS_Payments.Tests/        # Test projects
+│       └── PaymentServiceTests.cs     # Unit tests
+├── stripe-mock/
+│   └── fixtures.json                  # Mock scenarios configuration
+├── docker-compose.stripe-mock.yml     # Stripe mock server
+├── src/docker-compose.api.yml         # API with stripe-mock
+├── test-mock-scenarios.sh             # Test script
+└── README.md                          # This file
 ```
 
 ## 🔧 Configuration
 
 ### Environment Variables
-- `StripeSettings:SecretKey`: Your Stripe secret key
-- `StripeSettings:PublishableKey`: Your Stripe publishable key
+- `StripeSettings:SecretKey`: Your Stripe secret key (or mock key)
+- `StripeSettings:PublishableKey`: Your Stripe publishable key (or mock key)
+- `StripeSettings:MockServerUrl`: URL of the stripe-mock server
+- `StripeSettings:UseMockServer`: Enable/disable mock server
 - `JwtSettings:SecretKey`: JWT signing key (at least 32 characters)
 
 ### Development vs Production
-- **Development**: Uses in-memory repository and test Stripe keys
-- **Production**: Should use a real database and production Stripe keys
+- **Development**: Uses stripe-mock server and in-memory repository
+- **Production**: Should use real Stripe API and a real database
 
 ## 🚨 Security Considerations
 
@@ -177,10 +269,11 @@ src/
 ## 📝 Development Notes
 
 - This is a study project for learning purposes
-- Uses Stripe test environment
+- Uses stripe-mock for development and testing
 - In-memory repository for simplicity
 - JWT authentication for microservice communication
 - Health checks for monitoring
+- Docker support for easy deployment
 
 ## 🤝 Contributing
 
