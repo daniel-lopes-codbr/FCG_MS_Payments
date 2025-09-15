@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "UW/Zy1PtRAKDz8hBhPo3hKV5YUTkGVgANy88buuYq8Q=",
+  "Source": "FCG.MS.Payments.API",
+  "BasePath": "_content/FCG.MS.Payments.API",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}

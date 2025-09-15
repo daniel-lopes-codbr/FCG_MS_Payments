@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: fcg_ms_payments:latest
+    container_name: payments_api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - Stripe__PublishableKey=
+      - Stripe__SecretKey=
+    ports:
+      - "5012:80"
+    networks:
+      - payments_network
+    restart: unless-stopped
+
+networks:
+  payments_network:
+    name: payments_network

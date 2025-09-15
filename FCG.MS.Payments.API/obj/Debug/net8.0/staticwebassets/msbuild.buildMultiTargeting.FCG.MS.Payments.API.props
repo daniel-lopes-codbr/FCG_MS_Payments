@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="../build/FCG.MS.Payments.API.props" />
+</Project>

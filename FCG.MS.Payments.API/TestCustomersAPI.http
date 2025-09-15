@@ -1,0 +1,201 @@
+### FCG MS Payments API - Customer Management Tests
+### This file contains test requests for the Customers API
+
+### Test 1: Create Customer - John Doe
+POST {{baseUrl}}/api/customers
+Content-Type: application/json
+X-API-Key: {{apiKey}}
+
+{
+  "name": "John Doe",
+  "email": "john.doe@example.com",
+  "externalCustomerId": "user_12345",
+  "phone": "+1-555-123-4567",
+  "description": "Premium customer from main application"
+}
+
+### Test 2: Create Customer - Jane Smith
+POST {{baseUrl}}/api/customers
+Content-Type: application/json
+X-API-Key: {{apiKey}}
+
+{
+  "name": "Jane Smith",
+  "email": "jane.smith@example.com",
+  "externalCustomerId": "user_67890",
+  "phone": "+1-555-987-6543",
+  "description": "Regular customer"
+}
+
+### Test 3: Create Customer - Bob Johnson (Minimal Data)
+POST {{baseUrl}}/api/customers
+Content-Type: application/json
+X-API-Key: {{apiKey}}
+
+{
+  "name": "Bob Johnson",
+  "email": "bob.johnson@example.com",
+  "externalCustomerId": "user_11111"
+}
+
+### Test 4: Create Customer - Alice Brown (International Phone)
+POST {{baseUrl}}/api/customers
+Content-Type: application/json
+X-API-Key: {{apiKey}}
+
+{
+  "name": "Alice Brown",
+  "email": "alice.brown@example.com",
+  "externalCustomerId": "user_22222",
+  "phone": "+44-20-7946-0958",
+  "description": "International customer from UK"
+}
+
+### Test 5: Create Customer - Charlie Wilson (No Phone)
+POST {{baseUrl}}/api/customers
+Content-Type: application/json
+X-API-Key: {{apiKey}}
+
+{
+  "name": "Charlie Wilson",
+  "email": "charlie.wilson@example.com",
+  "externalCustomerId": "user_33333",
+  "description": "Customer without phone number"
+}
+
+### Test 6: Get Customer by External ID - John Doe
+GET {{baseUrl}}/api/customers/user_12345
+X-API-Key: {{apiKey}}
+
+### Test 7: Get Customer by External ID - Jane Smith
+GET {{baseUrl}}/api/customers/user_67890
+X-API-Key: {{apiKey}}
+
+### Test 8: Get Customer by External ID - Bob Johnson
+GET {{baseUrl}}/api/customers/user_11111
+X-API-Key: {{apiKey}}
+
+### Test 9: Get Customer by External ID - Alice Brown
+GET {{baseUrl}}/api/customers/user_22222
+X-API-Key: {{apiKey}}
+
+### Test 10: Get Customer by External ID - Charlie Wilson
+GET {{baseUrl}}/api/customers/user_33333
+X-API-Key: {{apiKey}}
+
+### Test 11: Get Non-existent Customer (Should return 404)
+GET {{baseUrl}}/api/customers/non_existent_user
+X-API-Key: {{apiKey}}
+
+### Test 12: Create Customer with Invalid Email (Should fail validation)
+POST {{baseUrl}}/api/customers
+Content-Type: application/json
+X-API-Key: {{apiKey}}
+
+{
+  "name": "Invalid Email Test",
+  "email": "not-a-valid-email",
+  "externalCustomerId": "user_invalid_email",
+  "phone": "+1-555-123-4567"
+}
+
+### Test 13: Create Customer with Invalid Phone (Should fail validation)
+POST {{baseUrl}}/api/customers
+Content-Type: application/json
+X-API-Key: {{apiKey}}
+
+{
+  "name": "Invalid Phone Test",
+  "email": "invalid.phone@example.com",
+  "externalCustomerId": "user_invalid_phone",
+  "phone": "invalid-phone-number"
+}
+
+### Test 14: Create Customer with Missing Required Fields (Should fail validation)
+POST {{baseUrl}}/api/customers
+Content-Type: application/json
+X-API-Key: {{apiKey}}
+
+{
+  "name": "Missing Fields Test",
+  "email": "missing.fields@example.com"
+}
+
+### Test 15: Create Customer with Empty External ID (Should fail validation)
+POST {{baseUrl}}/api/customers
+Content-Type: application/json
+X-API-Key: {{apiKey}}
+
+{
+  "name": "Empty External ID Test",
+  "email": "empty.external@example.com",
+  "externalCustomerId": "",
+  "phone": "+1-555-123-4567"
+}
+
+### Test 16: Create Customer with Long Description
+POST {{baseUrl}}/api/customers
+Content-Type: application/json
+X-API-Key: {{apiKey}}
+
+{
+  "name": "Long Description Test",
+  "email": "long.description@example.com",
+  "externalCustomerId": "user_long_desc",
+  "phone": "+1-555-123-4567",
+  "description": "This is a very long description to test how the API handles longer text content for customer descriptions. It includes multiple sentences and should be processed correctly by the system."
+}
+
+### Test 17: Create Customer with Special Characters in Name
+POST {{baseUrl}}/api/customers
+Content-Type: application/json
+X-API-Key: {{apiKey}}
+
+{
+  "name": "José María O'Connor-Smith",
+  "email": "special.chars@example.com",
+  "externalCustomerId": "user_special_chars",
+  "phone": "+1-555-123-4567",
+  "description": "Customer with special characters in name"
+}
+
+### Test 18: Create Customer with Very Long External ID
+POST {{baseUrl}}/api/customers
+Content-Type: application/json
+X-API-Key: {{apiKey}}
+
+{
+  "name": "Long External ID Test",
+  "email": "long.external@example.com",
+  "externalCustomerId": "very_long_external_customer_id_for_testing_purposes_2024",
+  "phone": "+1-555-123-4567"
+}
+
+### Test 19: Create Customer with Different Phone Formats
+POST {{baseUrl}}/api/customers
+Content-Type: application/json
+X-API-Key: {{apiKey}}
+
+{
+  "name": "Phone Format Test",
+  "email": "phone.format@example.com",
+  "externalCustomerId": "user_phone_format",
+  "phone": "(555) 123-4567"
+}
+
+### Test 20: Create Customer with Brazilian Phone Format
+POST {{baseUrl}}/api/customers
+Content-Type: application/json
+X-API-Key: {{apiKey}}
+
+{
+  "name": "Brazilian Customer",
+  "email": "brazilian.customer@example.com",
+  "externalCustomerId": "user_brazil",
+  "phone": "+55-11-99999-8888",
+  "description": "Customer from Brazil with local phone format"
+}
+
+### Environment Variables (set these in your IDE or environment)
+# @baseUrl = https://localhost:7001
+# @apiKey = your-api-key-here
