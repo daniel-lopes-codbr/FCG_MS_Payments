@@ -3,7 +3,7 @@ name: CD - Deploy Docker no Amazon ECR
 on:
   push:
     branches:
-      - master
+      - main
 jobs:
   deploy:
     name: Buildar e enviar imagem para o ECR
