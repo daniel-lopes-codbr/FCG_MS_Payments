@@ -1,0 +1,25 @@
+name: CI - FCG_MS_Payments
+
+on:
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build-and-test:
+    name: Build e Testes Automatizados
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout do código
+      uses: actions/checkout@v4
+
+    - name: Setup do .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Restaurar pacotes
+      run: dotnet restore FCG_MS_Payments.sln
+
+    - name: Buildar solução
+      run: dotnet build FCG_MS_Payments.sln --no-restore --configuration Release
