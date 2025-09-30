@@ -1,31 +1,64 @@
-# FCG MS Payments API
+# FCG_MS_Payments
+Microserviço responsável por gerenciar pagamentos, integração com Stripe e operações de cobrança, visando ser usado por outras partes do ecossistema (ex: front-end, microserviços que vendem produtos).
 
-A .NET 8 API for handling Stripe payments following Clean Architecture principles. 
-
-## Project Structure
+## Principais Tecnologias
 
 This project follows Clean Architecture with the following layers:
 
-- **Domain**: Contains core business entities (Product, Payment)
-- **Application**: Contains business logic, DTOs, and interfaces
-- **Infrastructure**: Contains external dependencies (Stripe SDK implementation)
-- **API**: Contains controllers and API endpoints
+- .NET 8 – API estruturada em camadas (domínio, aplicação, infraestrutura, API)
+- Docker (multi-stage) – build otimizado e imagem final leve
+- GitHub Actions (CI/CD) – build, testes e publicação automatizada
+- Stripe .NET SDK – integração com plataforma de pagamentos Stripe
+- Amazon RDS (PostgreSQL) – Banco de dados persistente em nuvem
+- New Relic – Observabilidade, logs e monitoramento de performance
 
-## Features
+## Funcionalidades
 
-- Create products in Stripe
-- Create payment intents for products
-- Check payment status
-- Full Swagger/OpenAPI documentation
+- Criação de produtos no Stripe
+- Criação de payment intents para produtos
+- Consulta de status de pagamento
+- Confirmação automática
 
-## Prerequisites
+## Autenticação e Permissões
 
-- .NET 8 SDK
-- Stripe account with test API keys
+- Autenticaçaõ com API keys
 
-## Configuration
+## Arquitetura
+ - FCG_MS_Game_Library
 
-1. Update the `appsettings.json` file with your Stripe API keys:
+    - Api – Controllers, Filtros, Configuração de rotas, Program.cs
+
+    - Application – DTOs, casos de uso, interfaces (contratos)
+
+    - Domain – Entidades centrais (Payment, Product, Transaction), regras de negócio
+
+    - Infrastructure – Implementação de repositórios, cliente Stripe, persistência
+## 🚀 CI/CD com GitHub Actions
+
+- CI (Pull Request):
+
+    - Build da solução
+
+- CD (Merge para master):
+
+    - Construção da imagem Docker
+  
+    - Publicação automática no Amazon ECR com tag latest
+
+✅ Garantindo entregas consistentes, seguras e automatizadas.
+
+## 📊 Monitoramento com New Relic
+- Agent do New Relic instalado no container em execução na EC2
+
+- Coleta de métricas: CPU, memória, throughput e latência
+
+- Logs estruturados em JSON enviados ao New Relic Logs
+
+- Monitorando erros, status codes e performance em tempo real
+  
+## ▶️ Como Rodar
+
+1. Atualize o arquivo appsettings.json com suas chaves da API Stripe:
 
 ```json
 {
@@ -36,13 +69,13 @@ This project follows Clean Architecture with the following layers:
 }
 ```
 
-2. For production, use environment variables or secure configuration management.
+2. Para produção, utilize variáveis de ambiente ou um gerenciador de configuração seguro.
 
-## API Endpoints
+## Endpoits
 
 ### Products
 
-- `POST /api/products` - Create a new product
+- `POST /api/products` - Cria um novo produto
 
 Request body:
 ```json
@@ -56,7 +89,7 @@ Request body:
 
 ### Payments
 
-- `POST /api/payments/create` - Create a payment intent
+- `POST /api/payments/create` - Cria uma payment intent
 
 Request body:
 ```json
@@ -65,33 +98,24 @@ Request body:
 }
 ```
 
-- `GET /api/payments/{id}` - Get payment status
+- `GET /api/payments/{id}` - Consulta o status do pagamento
 
-## Running the Application
+## Executando a Aplicação
 
-1. Navigate to the API project:
+1. Navegue até o projeto da API:
 ```bash
 cd FCG.MS.Payments.API
 ```
 
-2. Run the application:
+2. Execute a aplicação:
 ```bash
 dotnet run
 ```
 
-3. Access Swagger documentation at: `https://localhost:7001/swagger`
+3. Acesse a documentação do Swagger em: `https://localhost:7001/swagger`
 
-## Testing
+## Testes
 
-The API is configured to work with Stripe's test environment. Use test card numbers provided by Stripe for testing payments.
+A API está configurada para funcionar com o ambiente de testes do Stripe.
+Use os números de cartões de teste fornecidos pelo Stripe para simular pagamentos.
 
-## Architecture
-
-This project implements Clean Architecture principles:
-
-- **Domain Layer**: Pure business logic and entities
-- **Application Layer**: Use cases and business rules
-- **Infrastructure Layer**: External services and data access
-- **Presentation Layer**: API controllers and DTOs
-
-The separation of concerns allows for easy testing and future modifications without affecting the core business logic.
