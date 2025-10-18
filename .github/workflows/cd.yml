@@ -35,3 +35,24 @@ jobs:
     - name: Push no ECR
       run: |
         docker push ${{ secrets.ECR_REPOSITORY }}:latest
+
+    - name: Configurar o kubectl
+      uses: aws-actions/eks-setup-kubectl@v4
+      with:
+        version: '1.30'
+
+    - name: Obter credenciais do cluster EKS
+      run: |
+        aws eks update-kubeconfig --region ${{ secrets.AWS_REGION }} --name ${{ secrets.EKS_CLUSTER_NAME }}
+
+    - name: Criar ou atualizar secrets no Kubernetes
+      run: |
+        kubectl create secret generic fcg-ms-payments-secret \
+          --from-literal=Stripe__PublishableKey="${{ secrets.STRIPE_PUBLISHABLE_KEY }}" \
+          --from-literal=Stripe__SecretKey="${{ secrets.STRIPE_SECRET_KEY }}" \
+          --dry-run=client -o yaml | kubectl apply -f -
+
+    - name: Aplicar Deployment no EKS
+      run: |
+        kubectl set image deployment/fcg-ms-payments fcg-ms-payments=${{ secrets.ECR_REPOSITORY_PAYMENTS }}:latest --namespace default
+        kubectl rollout status deployment/fcg-ms-payments --namespace default
