@@ -1,7 +1,8 @@
+using FCG.MS.Payments.API.Middleware;
 using FCG.MS.Payments.Application.Interfaces;
 using FCG.MS.Payments.Infrastructure.Configuration;
+using FCG.MS.Payments.Infrastructure.Messaging;
 using FCG.MS.Payments.Infrastructure.Services;
-using FCG.MS.Payments.API.Middleware;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -38,6 +39,7 @@ builder.Services.Configure<AdminSettings>(
 // Register services
 builder.Services.AddScoped<IPaymentService, StripePaymentService>();
 builder.Services.AddScoped<IApiKeyService, ApiKeyService>();
+builder.Services.AddHostedService<PaymentConsumerService>();
 
 // Add health checks
 builder.Services.AddHealthChecks()
@@ -47,8 +49,8 @@ var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 
-    app.UseSwagger();
-    app.UseSwaggerUI();
+app.UseSwagger();
+app.UseSwaggerUI();
 
 
 app.UseHttpsRedirection();
