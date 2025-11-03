@@ -43,7 +43,13 @@ public class PaymentConsumerService : BackgroundService
             try
             {
                 var message = Encoding.UTF8.GetString(ea.Body.ToArray());
-                var createCheckoutRequest = JsonSerializer.Deserialize<CreateCheckoutRequest>(message);
+
+                var jsonOptions = new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                };
+
+                var createCheckoutRequest = JsonSerializer.Deserialize<CreateCheckoutRequest>(message, jsonOptions);
 
                 using var scope = _serviceProvider.CreateScope();
                 var paymentService = scope.ServiceProvider.GetRequiredService<IPaymentService>();
