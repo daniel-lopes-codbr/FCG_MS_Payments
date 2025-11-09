@@ -129,7 +129,7 @@ public class StripePaymentService : IPaymentService
             });
 
             // Find product by externalProductId in metadata
-            var product = products.Data.FirstOrDefault(p => 
+            var product = products.Data.FirstOrDefault(p =>
                 p.Metadata?.GetValueOrDefault("externalProductId") == externalProductId);
 
             if (product == null)
@@ -221,7 +221,7 @@ public class StripePaymentService : IPaymentService
             });
 
             // Find customer by externalCustomerId in metadata
-            var customer = customers.Data.FirstOrDefault(c => 
+            var customer = customers.Data.FirstOrDefault(c =>
                 c.Metadata?.GetValueOrDefault("externalCustomerId") == externalCustomerId);
 
             if (customer == null)
@@ -286,7 +286,7 @@ public class StripePaymentService : IPaymentService
                     },
                 },
                 Mode = "payment",
-                       SuccessUrl = "http://localhost:4200/payment-success?success=true",
+                SuccessUrl = "http://localhost:4200/payment-success?success=true",
                 CancelUrl = "http://localhost:4200/cart?canceled=true",
                 Customer = customer.Id,
                 Metadata = new Dictionary<string, string>

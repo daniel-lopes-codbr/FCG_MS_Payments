@@ -49,13 +49,13 @@ public class PaymentConsumerService : BackgroundService
                     PropertyNameCaseInsensitive = true
                 };
 
-                var createCheckoutRequest = JsonSerializer.Deserialize<CreateCheckoutRequest>(message, jsonOptions);
+                var createCheckoutRequest = JsonSerializer.Deserialize<CreateCustomerRequest>(message, jsonOptions);
 
                 using var scope = _serviceProvider.CreateScope();
                 var paymentService = scope.ServiceProvider.GetRequiredService<IPaymentService>();
 
                 if (createCheckoutRequest != null)
-                    await paymentService.CreateCheckoutAsync(createCheckoutRequest);
+                    await paymentService.CreateCustomerAsync(createCheckoutRequest);
 
                 await channel.BasicAckAsync(ea.DeliveryTag, false);
             }
